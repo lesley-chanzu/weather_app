@@ -1,36 +1,32 @@
-/*document.getElementById('searchButton').addEventListener('click', function(){
+// Get the API key from https://openweathermap.org/
+const API_KEY = "5c7e8a2e7ebfe2bdac595c49591ef941";
 
-const city = document.getElementById('locationInput').ariaValueMax;*/
+// Get the user's location
+navigator.geolocation.getCurrentPosition(position => {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
 
-  /* check above code if there is an error later*/
-const apiKey = '5c7e8a2e7ebfe2bdac595c49591ef941';
-const apiUrl = 'https://api,openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=meric';
+  // API endpoint URL
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
 
-const locationInput = document.getElementById('locationInput');
-const searchButton = document.getElementById('searchButton');
-const locationElement = document.getElementById('location');
-const temperatureElement = document.getElementById('temperature');
-const descriptionElement = document.getElementById('description');
+  // Fetch the weather data
+  fetch(url)
+   .then(response => response.json())
+   .then(data => {
+      // Extract the weather data
+      const weather = data.weather[0];
+      const temp = data.main.temp;
+      const humidity = data.main.humidity;
+      const windSpeed = data.wind.speed;
+      const city = data.name;
 
-searchButton.addEventListener('click', () => {
-  const location = locationInput.value;
-  if (location) {
-    fetchWeather(location);
-  }
+      // Display the weather data on the page
+      document.getElementById("city").innerText = city;
+      document.getElementById("temperature").innerText = `${temp}°C`;
+      document.getElementById("humidity").innerText = `Humidity: ${humidity}%`;
+      document.getElementById("wind-speed").innerText = `Wind Speed: ${windSpeed} m/s`;
+      document.getElementById("weather-condition").innerText = `Weather: ${weather.main}`;
+    })
+   .catch(error => console.error("Error:", error));
 });
 
-function fetchWeather(location) {
-  const url = '${apiUrl}?q=${location}&appid=${apikey}&units=metric';
-
-  fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        locationElement.textContent = data.name;
-        temperatureElement.textContent = '${Math.round(data.main.temp)}°C';
-        descriptionElement.textContent = data.weather[0].description;
-      })
-      
-      .catch(error => {
-        console.error('Error fetching weather data.Please try again later:', error);
-      });
-}
